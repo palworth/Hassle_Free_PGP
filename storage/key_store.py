@@ -1,6 +1,7 @@
 """Keyring storage management."""
 import os
 import json
+import re
 from pathlib import Path
 from typing import List, Dict, Optional
 from pgpy import PGPKey
@@ -65,6 +66,24 @@ class KeyStore:
     def _get_fingerprint(self, key: PGPKey) -> str:
         """Get fingerprint string from key."""
         return str(key.fingerprint).replace(' ', '')
+    
+    def _validate_fingerprint(self, fingerprint: str) -> bool:
+        """
+        Validate fingerprint contains only hex characters.
+        Prevents path traversal attacks.
+        
+        Args:
+            fingerprint: Fingerprint string to validate
+            
+        Returns:
+            True if valid, False otherwise
+        """
+        fingerprint = fingerprint.replace(' ', '')
+        # PGP fingerprints are hex strings, typically 40 chars (SHA-1) or 32 chars (MD5)
+        # Allow reasonable length (8-64 chars) and only hex characters
+        if not fingerprint or len(fingerprint) < 8 or len(fingerprint) > 64:
+            return False
+        return bool(re.match(r'^[0-9A-Fa-f]+$', fingerprint))
     
     def _set_file_permissions(self, file_path: Path):
         """Set secure file permissions (600) on Unix systems."""
@@ -138,10 +157,26 @@ class KeyStore:
         """
         fingerprint = fingerprint.replace(' ', '')
         
+        # SECURITY: Validate fingerprint to prevent path traversal
+        if not self._validate_fingerprint(fingerprint):
+            return None
+        
         if private:
             key_file = self.private_dir / f"{fingerprint}.asc"
         else:
             key_file = self.public_dir / f"{fingerprint}.asc"
+        
+        # SECURITY: Ensure resolved path is within expected directory
+        try:
+            key_file_resolved = key_file.resolve()
+            expected_dir = self.private_dir if private else self.public_dir
+            expected_dir_resolved = expected_dir.resolve()
+            
+            # Check if the resolved path is within the expected directory
+            if not str(key_file_resolved).startswith(str(expected_dir_resolved)):
+                return None
+        except (OSError, RuntimeError):
+            return None
         
         if not key_file.exists():
             return None
@@ -168,14 +203,31 @@ class KeyStore:
         """
         fingerprint = fingerprint.replace(' ', '')
         
+        # SECURITY: Validate fingerprint to prevent path traversal
+        if not self._validate_fingerprint(fingerprint):
+            return
+        
         # Remove files
         public_key_file = self.public_dir / f"{fingerprint}.asc"
         private_key_file = self.private_dir / f"{fingerprint}.asc"
         
-        if public_key_file.exists():
-            public_key_file.unlink()
-        if private_key_file.exists():
-            private_key_file.unlink()
+        # SECURITY: Ensure resolved paths are within expected directories
+        try:
+            public_resolved = public_key_file.resolve()
+            private_resolved = private_key_file.resolve()
+            public_dir_resolved = self.public_dir.resolve()
+            private_dir_resolved = self.private_dir.resolve()
+            
+            # Only delete if paths are within expected directories
+            if public_key_file.exists():
+                if str(public_resolved).startswith(str(public_dir_resolved)):
+                    public_key_file.unlink()
+            
+            if private_key_file.exists():
+                if str(private_resolved).startswith(str(private_dir_resolved)):
+                    private_key_file.unlink()
+        except (OSError, RuntimeError):
+            return
         
         # Update metadata
         metadata = self._load_metadata()
