@@ -1,10 +1,13 @@
-"""Encryption and decryption operations."""
-import pgpy
-from pgpy import PGPKey
-from typing import List, Tuple, Dict
+"""Helpers for encrypting and decrypting messages."""
+from __future__ import annotations
+
+from typing import Dict, Iterable, Tuple
+
+from pgpy import PGPKey, PGPMessage
+from pgpy.constants import CompressionAlgorithm
 
 
-def encrypt_message(plaintext: str, recipient_public_keys: List[PGPKey]) -> str:
+def encrypt_message(plaintext: str, recipient_public_keys: Iterable[PGPKey]) -> str:
     """
     Encrypt message to one or more recipients.
 
@@ -15,14 +18,18 @@ def encrypt_message(plaintext: str, recipient_public_keys: List[PGPKey]) -> str:
     Returns:
         ASCII-armored encrypted message
     """
-    if not recipient_public_keys:
+    recipients = [key for key in recipient_public_keys if key is not None]
+    if not plaintext:
+        raise ValueError("Plaintext message is required")
+    if not recipients:
         raise ValueError("At least one recipient public key is required")
+    if len(recipients) > 1:
+        raise ValueError("Encrypting to multiple recipients is not supported in this build")
 
-    # Create a message object
-    message = pgpy.PGPMessage.new(plaintext)
-
-    # Encrypt for all recipients
-    encrypted_message = message.encrypt(recipient_public_keys)
+    key = recipients[0]
+    message = PGPMessage.new(plaintext, compression=CompressionAlgorithm.Uncompressed)
+    target_key = key if key.is_public else key.pubkey
+    encrypted_message = target_key.encrypt(message)
 
     return str(encrypted_message)
 
@@ -40,11 +47,11 @@ def decrypt_message(ciphertext: str, private_key: PGPKey, passphrase: str) -> Tu
         Tuple of (plaintext, metadata_dict)
         metadata_dict contains: 'signer' (if signed), 'verified' (if signature verified)
     """
-    if not private_key.is_private:
-        raise ValueError("Provided key does not contain a private key")
+    if private_key.is_public:
+        raise ValueError("Provided key does not contain a private component")
 
     # Parse the encrypted message
-    encrypted_message = pgpy.PGPMessage.from_blob(ciphertext)
+    encrypted_message = PGPMessage.from_blob(ciphertext)
 
     # Unlock the private key and decrypt
     with private_key.unlock(passphrase):

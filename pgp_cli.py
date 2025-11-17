@@ -5,13 +5,13 @@ Works without Tkinter - perfect for servers and systems without GUI.
 """
 import sys
 
-# Add compatibility for Python 3.13+
-try:
-    import compat_imghdr  # noqa: F401
-except ImportError:
-    pass
-
-from crypto.keys import generate_keypair, import_key as crypto_import_key, export_public_key, export_private_key
+from crypto.keys import (
+    ensure_private_key_is_protected,
+    export_private_key,
+    export_public_key,
+    generate_keypair,
+    import_key as crypto_import_key,
+)
 from crypto.encrypt_decrypt import encrypt_message, decrypt_message
 from crypto.sign_verify import sign_message, verify_signature
 from storage.key_store import KeyStore
@@ -88,6 +88,13 @@ class PGPCLI:
 
         try:
             key = crypto_import_key(armored_key, passphrase)
+            if not key.is_public and not key.is_protected:
+                new_passphrase = passphrase or input(
+                    "\nThis private key is unprotected. Enter a new passphrase to secure it: ").strip()
+                if not new_passphrase:
+                    print("❌ Error: Private keys must be passphrase-protected before storage")
+                    return
+                ensure_private_key_is_protected(key, new_passphrase)
             name = ''
             email = ''
             if key.userids:

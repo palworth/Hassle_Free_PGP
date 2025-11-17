@@ -1,11 +1,13 @@
 """Keyring storage management."""
-import os
+from __future__ import annotations
+
 import json
+import os
 import re
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 from pgpy import PGPKey
-from pgpy.packet.types import Private
 
 
 class KeyStore:
@@ -50,14 +52,14 @@ class KeyStore:
         if not self.metadata_file.exists():
             return {}
         try:
-            with open(self.metadata_file, 'r') as f:
+            with open(self.metadata_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except (json.JSONDecodeError, IOError):
             return {}
 
     def _save_metadata(self, metadata: Dict):
         """Save metadata to JSON file."""
-        with open(self.metadata_file, 'w') as f:
+        with open(self.metadata_file, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2)
         # Set secure permissions (600 = rw-------)
         if os.name != 'nt':
@@ -111,15 +113,19 @@ class KeyStore:
         # Export and save public key
         public_key_armored = str(key.pubkey)
         public_key_file = self.public_dir / f"{fingerprint}.asc"
-        with open(public_key_file, 'w') as f:
+        with open(public_key_file, 'w', encoding='utf-8') as f:
             f.write(public_key_armored)
         self._set_file_permissions(public_key_file)
 
         # Export and save private key if present
-        if isinstance(key._key, Private):
+        has_private = not key.is_public
+        if has_private and not key.is_protected:
+            raise ValueError("Private keys must be protected with a passphrase before storage")
+
+        if has_private:
             private_key_armored = str(key)
             private_key_file = self.private_dir / f"{fingerprint}.asc"
-            with open(private_key_file, 'w') as f:
+            with open(private_key_file, 'w', encoding='utf-8') as f:
                 f.write(private_key_armored)
             self._set_file_permissions(private_key_file)
 
@@ -128,7 +134,7 @@ class KeyStore:
         metadata[fingerprint] = {
             'name': name or '',
             'email': email or '',
-            'has_private': isinstance(key._key, Private),
+            'has_private': has_private,
             'fingerprint': fingerprint,
         }
         self._save_metadata(metadata)
@@ -143,14 +149,13 @@ class KeyStore:
         metadata = self._load_metadata()
         return list(metadata.values())
 
-    def get_key(self, fingerprint: str, private: bool = False, passphrase: Optional[str] = None) -> Optional[PGPKey]:
+    def get_key(self, fingerprint: str, private: bool = False) -> Optional[PGPKey]:
         """
         Retrieve key by fingerprint.
 
         Args:
             fingerprint: Key fingerprint (with or without spaces)
             private: If True, retrieve private key; if False, retrieve public key
-            passphrase: Optional passphrase if retrieving protected private key
 
         Returns:
             PGPKey object or None if not found
@@ -182,7 +187,7 @@ class KeyStore:
             return None
 
         try:
-            with open(key_file, 'r') as f:
+            with open(key_file, 'r', encoding='utf-8') as f:
                 armored_key = f.read()
 
             key, _ = PGPKey.from_blob(armored_key)
