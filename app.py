@@ -1,4 +1,5 @@
 """Main Tkinter application."""
+import logging
 import platform
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog
@@ -740,6 +741,13 @@ class PGPApplication:
         self.keyring_view.load_keys(keys)
         self.keyring_status_var.set(f"[ LOADED {len(keys)} KEY(S) ]")
 
+    def report_error(self, context: str, error: Exception):
+        """Log errors and surface them in the status bar."""
+        message = f"[ ERROR ] {context}: {error}"
+        logging.error(message)
+        if hasattr(self, 'status_var'):
+            self.status_var.set(message)
+
     def on_key_select(self, fingerprint: str):
         """Handle key selection from keyring."""
         # This will be used when selecting keys for operations
@@ -751,8 +759,8 @@ class PGPApplication:
             self.key_store.remove_key(fingerprint)
             self.refresh_keyring()
             self.status_var.set("[ KEY DELETED ]")
-        except Exception:
-            pass  # messagebox popup removed
+        except Exception as exc:
+            self.report_error("Failed to delete key", exc)
 
     def add_public_key_dialog(self, fingerprint: str):
         """Show dialog to add/update public key for a private key."""
@@ -821,8 +829,8 @@ class PGPApplication:
                 self.refresh_keyring()
                 dialog.destroy()
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to import public key", exc)
         if key_text.cget('state') != 'disabled':
             ttk.Button(dialog, text="Add Public Key", command=import_public).pack(pady=10)
         else:
@@ -1045,8 +1053,8 @@ class PGPApplication:
                 self.refresh_keyring()
                 dialog.destroy()
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to import private key", exc)
         ttk.Button(private_frame, text="Import Private Key", command=import_private).pack(pady=10)
 
         # Tab 2: Paste Public Key
@@ -1096,8 +1104,8 @@ class PGPApplication:
                 self.refresh_keyring()
                 dialog.destroy()
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to import public key", exc)
         ttk.Button(public_frame, text="Import Public Key", command=import_public).pack(pady=10)
 
         # Tab 3: Load from File
@@ -1169,8 +1177,8 @@ class PGPApplication:
                 self.refresh_keyring()
                 dialog.destroy()
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to import key from file", exc)
         ttk.Button(file_frame, text="Select File...", command=select_file).pack(pady=10)
         ttk.Button(file_frame, text="Import from File", command=import_from_file).pack(pady=10)
 
@@ -1214,8 +1222,8 @@ class PGPApplication:
                 self.mode_label.config(text="Public Key Export")
                 dialog.destroy()
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to export public key", exc)
 
         def export_private():
             passphrase = self.ask_passphrase("Passphrase Required", "Enter passphrase to protect exported key:")
@@ -1236,8 +1244,8 @@ class PGPApplication:
                 self.mode_label.config(text="Private Key Export")
                 dialog.destroy()
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to export private key", exc)
         ttk.Button(dialog, text="Export Public Key", command=export_public).pack(pady=10)
         ttk.Button(dialog, text="Export Private Key", command=export_private).pack(pady=10)
 
@@ -1307,8 +1315,8 @@ class PGPApplication:
                 copy_btn.pack(pady=5)
 
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to encrypt message", exc)
         # Buttons
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(pady=10)
@@ -1424,8 +1432,8 @@ class PGPApplication:
                 decrypted_text.config(state='disabled')
 
                 pass  # messagebox popup removed
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to decrypt message", exc)
         # Buttons
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(pady=10)
@@ -1513,8 +1521,8 @@ class PGPApplication:
                 self.output_text.delete('1.0', tk.END)
                 self.output_text.insert('1.0', signature)
                 self.status_var.set("[ MESSAGE SIGNED ]")
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to sign message", exc)
         # Custom button to fix macOS color bug
         sign_btn = self.create_small_custom_button(
             self.action_frame,
@@ -1651,8 +1659,8 @@ class PGPApplication:
 
                 result_text.config(state='disabled')
 
-            except Exception:
-                pass  # messagebox popup removed
+            except Exception as exc:
+                self.report_error("Failed to verify signature", exc)
         # Buttons
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(pady=10)
