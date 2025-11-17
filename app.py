@@ -48,6 +48,119 @@ class PGPApplication:
         # Load keys into keyring view
         self.refresh_keyring()
     
+    def ask_passphrase(self, title="Passphrase", prompt="Enter passphrase:"):
+        """
+        Show a custom styled passphrase dialog that matches the app design.
+        
+        Args:
+            title: Dialog title
+            prompt: Prompt text
+            
+        Returns:
+            Passphrase string or None if cancelled
+        """
+        dialog = tk.Toplevel(self.root)
+        dialog.title(title)
+        dialog.geometry("500x200")
+        dialog.transient(self.root)
+        dialog.grab_set()
+        dialog.resizable(False, False)
+        
+        # Configure colors
+        dialog.configure(bg=self.colors['bg'])
+        
+        result = {'passphrase': None}
+        
+        # Main frame
+        main_frame = tk.Frame(dialog, bg=self.colors['bg'], padx=30, pady=30)
+        main_frame.pack(fill='both', expand=True)
+        
+        # Prompt label
+        prompt_label = tk.Label(
+            main_frame,
+            text=prompt,
+            font=('Courier New', 12, 'bold'),
+            bg=self.colors['bg'],
+            fg=self.colors['fg']
+        )
+        prompt_label.pack(pady=(0, 15))
+        
+        # Passphrase entry - BLACK background with WHITE text
+        pass_entry = tk.Entry(
+            main_frame,
+            show='●',
+            font=('Courier New', 14),
+            bg='#000000',  # Pure black
+            fg='#FFFFFF',  # Pure white
+            insertbackground='#FFFFFF',  # White cursor
+            relief='solid',
+            borderwidth=2,
+            width=35
+        )
+        pass_entry.pack(pady=(0, 25), ipady=10)
+        pass_entry.focus()
+        
+        # Button frame
+        button_frame = tk.Frame(main_frame, bg=self.colors['bg'])
+        button_frame.pack()
+        
+        def on_ok():
+            result['passphrase'] = pass_entry.get()
+            dialog.destroy()
+        
+        def on_cancel():
+            result['passphrase'] = None
+            dialog.destroy()
+        
+        # OK button - BLACK
+        ok_btn = tk.Button(
+            button_frame,
+            text="[ OK ]",
+            command=on_ok,
+            font=('Courier New', 11, 'bold'),
+            bg='#000000',  # Black
+            fg='#FFFFFF',  # White text
+            activebackground='#333333',  # Dark grey on hover
+            activeforeground='#FFFFFF',
+            relief='flat',
+            padx=30,
+            pady=10,
+            cursor='hand2'
+        )
+        ok_btn.pack(side='left', padx=10)
+        
+        # Cancel button - BLACK
+        cancel_btn = tk.Button(
+            button_frame,
+            text="[ CANCEL ]",
+            command=on_cancel,
+            font=('Courier New', 11, 'bold'),
+            bg='#000000',  # Black
+            fg='#FFFFFF',  # White text
+            activebackground='#333333',  # Dark grey on hover
+            activeforeground='#FFFFFF',
+            relief='flat',
+            padx=20,
+            pady=10,
+            cursor='hand2'
+        )
+        cancel_btn.pack(side='left', padx=10)
+        
+        # Bind Enter key to OK
+        pass_entry.bind('<Return>', lambda e: on_ok())
+        pass_entry.bind('<Escape>', lambda e: on_cancel())
+        
+        # Center the dialog
+        dialog.update_idletasks()
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - (dialog.winfo_width() // 2)
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (dialog.winfo_height() // 2)
+        dialog.geometry(f"+{x}+{y}")
+        
+        # Wait for dialog to close
+        dialog.wait_window()
+        
+        return result['passphrase']
+    
     def setup_brutalist_theme(self):
         """Configure brutalist/minimalist theme."""
         style = ttk.Style()
@@ -1087,7 +1200,7 @@ class PGPApplication:
             except Exception as e:
                 pass  # messagebox popup removed
         def export_private():
-            passphrase = simpledialog.askstring("Passphrase", "Enter passphrase to protect exported key:", show='*')
+            passphrase = self.ask_passphrase("Passphrase Required", "Enter passphrase to protect exported key:")
             if not passphrase:
                 return
             
@@ -1356,7 +1469,7 @@ class PGPApplication:
                 return
             
             # Prompt for passphrase
-            passphrase = simpledialog.askstring("Passphrase", "Enter passphrase for private key:", show='*')
+            passphrase = self.ask_passphrase("Passphrase Required", "Enter passphrase for private key:")
             if not passphrase:
                 return
             
@@ -1582,6 +1695,9 @@ class PGPApplication:
         """Clear action buttons frame."""
         for widget in self.action_frame.winfo_children():
             widget.destroy()
+        # Delete back_button attribute so it gets recreated next time
+        if hasattr(self, 'back_button'):
+            del self.back_button
 
 
 def main():
