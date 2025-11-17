@@ -520,29 +520,29 @@ class PGPApplication:
         # Mouse wheel scrolling: handle platform differences
         is_macos = platform.system() == "Darwin"
         is_linux = platform.system() == "Linux"
-        
+
         def on_mousewheel(event):
             # macOS trackpad sends small delta values, Windows sends ±120 per notch
             scroll_amount = -1 * event.delta if is_macos else int(-1 * (event.delta / 120))
             info_canvas.yview_scroll(scroll_amount, "units")
-        
+
         def bind_mousewheel(event):
             if is_linux:
                 info_canvas.bind_all("<Button-4>", lambda e: info_canvas.yview_scroll(-1, "units"))
                 info_canvas.bind_all("<Button-5>", lambda e: info_canvas.yview_scroll(1, "units"))
             else:
                 info_canvas.bind_all("<MouseWheel>", on_mousewheel)
-        
+
         def unbind_mousewheel(event):
             if is_linux:
                 info_canvas.unbind_all("<Button-4>")
                 info_canvas.unbind_all("<Button-5>")
             else:
                 info_canvas.unbind_all("<MouseWheel>")
-        
+
         info_canvas.bind("<Enter>", bind_mousewheel)
         info_canvas.bind("<Leave>", unbind_mousewheel)
-        
+
         info_canvas.pack(side='left', fill='both', expand=True)
         info_scrollbar.pack(side='right', fill='y')
 
