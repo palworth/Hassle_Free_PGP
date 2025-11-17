@@ -137,9 +137,10 @@ class KeyringView(ttk.Frame):
         Args:
             keys: List of key dictionaries with 'name', 'email', 'fingerprint'
         """
-        # Clear existing items
+        # Clear existing items and data
         for item in self.tree.get_children():
             self.tree.delete(item)
+        self.key_data.clear()
         
         # Add keys
         for key_info in keys:
@@ -150,7 +151,9 @@ class KeyringView(ttk.Frame):
             # Show short fingerprint (last 16 chars)
             short_fp = fingerprint[-16:] if len(fingerprint) > 16 else fingerprint
             
-            self.tree.insert('', 'end', values=(name, email, short_fp), tags=(fingerprint,))
+            # Insert into tree and store key data
+            item_id = self.tree.insert('', 'end', values=(name, email, short_fp), tags=(fingerprint,))
+            self.key_data[item_id] = key_info  # Store the key info for this item!
     
     def get_selected_fingerprint(self) -> Optional[str]:
         """Get the fingerprint of the currently selected key."""
