@@ -9,22 +9,6 @@
 
 ---
 
-## 👋 **NEW TO PGP? START HERE!**
-
-**Never used PGP encryption before? No problem!**
-
-📖 **[Complete Beginner's Guide →](USER_GUIDE_FOR_NON_CODERS.md)**
-
-This guide explains:
-- How to install the app (super easy!)
-- What PGP actually does (in plain English)
-- How to send/receive secret messages
-- Step-by-step instructions with no technical jargon
-
-**Already familiar with PGP?** Continue reading below for installation and technical details.
-
----
-
 Hassle Free PGP is a fully offline, security-focused PGP (Pretty Good Privacy) GUI application written in Python. Created to make solid encryption tools more accessible and easier to use, this tool operates completely offline with zero network access—perfect for privacy-conscious users who want transparent, verifiable security.
 
 ## 🔒 Why Hassle Free PGP?
@@ -52,112 +36,73 @@ Hassle Free PGP is a fully offline, security-focused PGP (Pretty Good Privacy) G
 
 Perfect for: Journalists, activists, security researchers, privacy advocates, and anyone who values secure, offline communication.
 
-## 🚀 Quick Start (No Programming Experience Required!)
+## 🚀 Quick Start (Copy/Paste Friendly)
 
-**Can you click buttons and copy-paste? Then you can use this tool!**
+The easiest way to run Hassle Free PGP today is to install Python, create a virtual environment, install the single dependency, and start the GUI. No additional download (such as `Hassle_Free_PGP.zip`) is checked into the repo—you create the app locally or grab a Release asset when one is published.
 
-### For Complete Beginners (macOS/Linux):
+### macOS (includes “what is Homebrew?” steps)
 
-1. **Download this project**
-   - Click the green "Code" button at the top of this page
-   - Click "Download ZIP"
-   - Unzip the downloaded file (double-click it)
-
-2. **Open Terminal**
-   - macOS: Press `Cmd + Space`, type "Terminal", press Enter
-   - Linux: Press `Ctrl + Alt + T`
-
-3. **Navigate to the downloaded folder**
-   ```bash
-   cd ~/Downloads/Hassle_Free_PGP-main
-   ```
-   (Or wherever you unzipped it)
-
-4. **Run the setup script** (copy and paste these commands one at a time):
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-   
-   **What this does:** Creates a safe, isolated environment and installs the one dependency needed (pgpy).
-
-5. **Start the application**
-   ```bash
-   python app.py
-   ```
-   
-   That's it! The app window will open. 🎉
-
-### For Complete Beginners (Windows):
-
-1. **Download this project**
-   - Click the green "Code" button at the top of this page
-   - Click "Download ZIP"
-   - Right-click the downloaded file → "Extract All"
-
-2. **Open Command Prompt**
-   - Press `Windows Key`, type "cmd", press Enter
-
-3. **Navigate to the downloaded folder**
-   ```cmd
-   cd %USERPROFILE%\Downloads\Hassle_Free_PGP-main
-   ```
-
-4. **Run the setup** (copy and paste these commands one at a time):
-   ```cmd
-   python -m venv venv
-   venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-5. **Start the application**
-   ```cmd
-   python app.py
-   ```
-   
-   The app window will open! 🎉
-
-### Next Time You Want to Use It:
-
-You only need to do the setup once! After that, just:
-
-**macOS/Linux:**
 ```bash
-cd ~/Downloads/Hassle_Free_PGP-main
-source venv/bin/activate
+# 1. Install Homebrew if you don’t already have it
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 2. Install the newest Python
+brew install python
+
+# 3. Download the source (pick ONE of these)
+git clone https://github.com/palwoth/Hassle_Free_PGP.git
+# OR click “Code → Download ZIP”, unzip, and cd into the folder
+
+cd Hassle_Free_PGP
+
+# 4. Create & activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 5. Install dependencies
+pip install -r requirements.txt
+
+# 6. Launch the app
 python app.py
 ```
 
-**Windows:**
-```cmd
-cd %USERPROFILE%\Downloads\Hassle_Free_PGP-main
-venv\Scripts\activate
+### Windows (PowerShell)
+
+```powershell
+# Download the source (Git clone or GitHub ZIP) and open PowerShell in that folder
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 python app.py
 ```
 
-### Don't Have Python Installed?
+### Linux
 
-**macOS:** Python comes pre-installed! Just try the commands above.
-
-**Linux:** Most distributions include Python. If not:
 ```bash
-sudo apt install python3 python3-pip  # Ubuntu/Debian
-sudo dnf install python3 python3-pip  # Fedora
+sudo apt install -y python3 python3-venv python3-pip  # adapt for your distro
+git clone https://github.com/palwoth/Hassle_Free_PGP.git
+cd Hassle_Free_PGP
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
 ```
 
-**Windows:** Download from [python.org](https://www.python.org/downloads/)
-- Download Python 3.7 or higher
-- **Important:** Check "Add Python to PATH" during installation!
-- Restart your computer after installing
+Next time you want to use the app, just activate the existing `.venv` and run `python app.py` again—no need to reinstall anything.
 
-### Need Help?
+### Need a drag-and-drop `.app`?
 
-- **Error: "python not found"** → Make sure Python is installed and added to PATH
-- **Error: "tkinter not found"** → Install tkinter: `sudo apt install python3-tk` (Linux)
-- **App won't start** → Make sure you activated the virtual environment (`source venv/bin/activate`)
+When you’re ready to ship a Mac bundle to someone else, run:
 
-Having trouble? Open an issue on GitHub and we'll help you out!
+```bash
+./build_app.sh
+cd dist
+zip -r Hassle_Free_PGP.zip "Hassle Free PGP.app"
+```
+
+Upload that ZIP to a GitHub Release or your own hosting and share the link. Keeping the binary out of git keeps the repo small and reviewable.
+
+If you hit issues (`tkinter` missing, Python not found, etc.), open an issue and we’ll help!
 
 ---
 
