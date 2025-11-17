@@ -5,7 +5,13 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog
 from gui.keyring_view import KeyringView
 from storage.key_store import KeyStore
-from crypto.keys import import_key as crypto_import_key, export_public_key, export_private_key
+from crypto.keys import (
+    ensure_private_key_is_protected,
+    export_private_key,
+    export_public_key,
+    generate_keypair,
+    import_key as crypto_import_key,
+)
 from crypto.encrypt_decrypt import encrypt_message, decrypt_message
 from crypto.sign_verify import sign_message, verify_signature
 from pgpy import PGPKey
@@ -802,7 +808,6 @@ class PGPApplication:
         try:
             existing_key = self.key_store.get_key(fingerprint, private=False)
             if existing_key:
-                from crypto.keys import export_public_key
                 key_text.insert('1.0', export_public_key(existing_key))
                 key_text.config(state='disabled')
                 ttk.Label(dialog, text="Public key already exists (shown above)", foreground='green').pack(pady=5)
@@ -928,18 +933,7 @@ class PGPApplication:
                     foreground='orange')
                 dialog.update()
 
-                # Generate the key with selected size
-                from crypto.keys import PGPKey, PubKeyAlgorithm, KeyFlags
-                import pgpy
-
-                # Create key with specified size
-                key = PGPKey.new(PubKeyAlgorithm.RSAEncryptOrSign, key_size)
-                uid = pgpy.PGPUID.new(name, email)
-                key.add_uid(uid, usage={KeyFlags.Sign, KeyFlags.EncryptCommunications, KeyFlags.EncryptStorage})
-                key.protect(
-                    passphrase,
-                    pgpy.constants.SymmetricKeyAlgorithm.AES256,
-                    pgpy.constants.HashAlgorithm.SHA256)
+                key = generate_keypair(name=name, email=email, passphrase=passphrase, key_size=key_size)
 
                 # Export keys
                 public_key_armored = export_public_key(key)
@@ -1043,6 +1037,12 @@ class PGPApplication:
 
             try:
                 key = crypto_import_key(armored_key, passphrase)
+
+                if not key.is_public and not key.is_protected:
+                    protection_passphrase = passphrase or self.ask_passphrase(
+                        title="Protect Imported Private Key",
+                        prompt="This private key is unprotected. Enter a passphrase to secure it:")
+                    ensure_private_key_is_protected(key, protection_passphrase)
 
                 # If email not provided, try to extract from key
                 if not email and key.userids:
@@ -1162,10 +1162,16 @@ class PGPApplication:
                 return
 
             try:
-                with open(filepath, 'r') as f:
+                with open(filepath, 'r', encoding='utf-8') as f:
                     armored_key = f.read()
 
                 key = crypto_import_key(armored_key, passphrase)
+
+                if not key.is_public and not key.is_protected:
+                    protection_passphrase = passphrase or self.ask_passphrase(
+                        title="Protect Imported Private Key",
+                        prompt="This private key is unprotected. Enter a passphrase to secure it:")
+                    ensure_private_key_is_protected(key, protection_passphrase)
 
                 # Extract email from key if available
                 email = ''
