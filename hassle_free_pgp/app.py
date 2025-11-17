@@ -3,20 +3,20 @@ import logging
 import platform
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog
-from gui.keyring_view import KeyringView
-from storage.key_store import KeyStore
-from crypto.keys import (
+from .gui.keyring_view import KeyringView
+from .storage.key_store import KeyStore
+from .crypto.keys import (
     ensure_private_key_is_protected,
     export_private_key,
     export_public_key,
     generate_keypair,
     import_key as crypto_import_key,
 )
-from crypto.encrypt_decrypt import encrypt_message, decrypt_message
-from crypto.sign_verify import sign_message, verify_signature
+from .crypto.encrypt_decrypt import encrypt_message, decrypt_message
+from .crypto.sign_verify import sign_message, verify_signature
 from pgpy import PGPKey
 from typing import List, Optional
-from colors import COLORS, BUTTON_COLORS
+from .colors import COLORS, BUTTON_COLORS
 
 
 class PGPApplication:

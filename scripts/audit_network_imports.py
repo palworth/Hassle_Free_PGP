@@ -140,30 +140,14 @@ def main():
     print(f"\nScanning project: {project_root}")
     print("Excluding: __pycache__, .git, venv, .venv, env, .env\n")
 
-    # Scan project code (exclude scripts directory itself to avoid false positives)
-    project_code = project_root / 'crypto'
-    project_gui = project_root / 'gui'
-    project_storage = project_root / 'storage'
-    project_app = project_root / 'app.py'
+    # Scan project code inside the main package
+    package_dir = project_root / 'hassle_free_pgp'
 
     all_results = {}
 
-    if project_code.exists():
-        results = scan_directory(project_code)
+    if package_dir.exists():
+        results = scan_directory(package_dir)
         all_results.update(results)
-
-    if project_gui.exists():
-        results = scan_directory(project_gui)
-        all_results.update(results)
-
-    if project_storage.exists():
-        results = scan_directory(project_storage)
-        all_results.update(results)
-
-    if project_app.exists():
-        matches = scan_file(project_app)
-        if matches:
-            all_results[str(project_app)] = matches
 
     # Report results
     if not all_results:

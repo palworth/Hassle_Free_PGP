@@ -6,7 +6,12 @@ Tests path traversal vulnerability fixes.
 import sys
 import tempfile
 from pathlib import Path
-from storage.key_store import KeyStore
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from hassle_free_pgp.storage.key_store import KeyStore
 
 
 def test_path_traversal_protection():

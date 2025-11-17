@@ -63,7 +63,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # 6. Launch the app
-python app.py
+python -m hassle_free_pgp.app
 ```
 
 ### Windows (PowerShell)
@@ -73,7 +73,7 @@ python app.py
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python app.py
+python -m hassle_free_pgp.app
 ```
 
 ### Linux
@@ -85,10 +85,10 @@ cd Hassle_Free_PGP
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python app.py
+python -m hassle_free_pgp.app
 ```
 
-Next time you want to use the app, just activate the existing `.venv` and run `python app.py` again—no need to reinstall anything.
+Next time you want to use the app, just activate the existing `.venv` and run `python -m hassle_free_pgp.app` again—no need to reinstall anything.
 
 ### Need a drag-and-drop `.app`?
 
@@ -162,7 +162,7 @@ If you're comfortable with Git and Python:
 
 4. **Run the application:**
    ```bash
-   python app.py
+python -m hassle_free_pgp.app
    ```
 
 ## 📖 How to Use
@@ -254,7 +254,7 @@ Verify protection against attacks:
 
 ```bash
 source venv/bin/activate
-python test_security.py
+python tests/test_security.py
 ```
 
 This verifies:
@@ -281,21 +281,23 @@ This scans the entire codebase for:
 ## Project Structure
 
 ```
-pgp_gui/
-├── crypto/              # Cryptographic operations
-│   ├── keys.py         # Key generation, import, export
-│   ├── encrypt_decrypt.py
-│   └── sign_verify.py
-├── storage/            # Key storage
-│   └── key_store.py
-├── gui/                # GUI components
-│   └── keyring_view.py
-├── scripts/            # Utility scripts
-│   └── audit_network_imports.py
-├── app.py             # Main application
-├── test_crypto.py     # CLI test script
-├── requirements.txt   # Dependencies
-└── SECURITY.md        # Security documentation
+Hassle_Free_PGP/
+├── hassle_free_pgp/
+│   ├── app.py                 # Tkinter GUI entrypoint
+│   ├── cli.py                 # Terminal interface
+│   ├── colors.py              # Centralized theme definitions
+│   ├── crypto/                # Cryptographic helpers
+│   ├── gui/                   # GUI widgets
+│   └── storage/               # Local keyring persistence
+├── scripts/                   # Repository maintenance scripts
+│   ├── audit_network_imports.py
+│   └── check_for_keys.sh
+├── tests/
+│   └── test_security.py       # Security regression tests
+├── build_app.sh               # macOS .app builder (py2app)
+├── run.sh                     # Developer convenience launcher
+├── requirements.txt
+└── README.md
 ```
 
 ## 🔐 Security
@@ -312,7 +314,7 @@ This application is designed with security as the top priority:
 ✅ **Open Source & Auditable**
 - All source code available for inspection
 - Comprehensive security testing included
-- Automated security tests: `python test_security.py`
+- Automated security tests: `python tests/test_security.py`
 
 ✅ **Secure by Design**
 - Keys stored with proper Unix permissions (600 for files, 700 for directories)
@@ -374,7 +376,7 @@ This is a security-focused application. Contributions are welcome, but must main
 **Before contributing:**
 1. ⚠️ **Understand security requirements** - Must maintain offline-only operation
 2. 🚫 **No network dependencies** - Must remain completely offline
-3. ✅ **Run security tests** - `python test_security.py` must pass
+3. ✅ **Run security tests** - `python tests/test_security.py` must pass
 4. ✅ **Run network audit** - `python scripts/audit_network_imports.py` must be clean
 5. 🧪 **Test on air-gapped system** - If possible
 

@@ -15,5 +15,5 @@ fi
 source venv/bin/activate
 
 # Run the application
-python app.py
+python -m hassle_free_pgp.app
 
