@@ -1,0 +1,11 @@
+# Default Bandit configuration focused on first-party code.
+exclude_dirs:
+  - .git
+  - .github
+  - venv
+  - .venv
+  - env
+  - build
+  - dist
+  - __pycache__
+
