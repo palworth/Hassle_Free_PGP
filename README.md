@@ -7,6 +7,24 @@
 
 **A safe, offline, open-source PGP encryption tool for everyone.**
 
+---
+
+## 👋 **NEW TO PGP? START HERE!**
+
+**Never used PGP encryption before? No problem!**
+
+📖 **[Complete Beginner's Guide →](USER_GUIDE_FOR_NON_CODERS.md)**
+
+This guide explains:
+- ✅ How to install the app (super easy!)
+- ✅ What PGP actually does (in plain English)
+- ✅ How to send/receive secret messages
+- ✅ Step-by-step instructions with no technical jargon
+
+**Already familiar with PGP?** Continue reading below for installation and technical details.
+
+---
+
 Hassle Free PGP is a fully offline, security-focused PGP (Pretty Good Privacy) GUI application written in Python. Created to make solid encryption tools more accessible and easier to use, this tool operates completely offline with zero network access—perfect for privacy-conscious users who want transparent, verifiable security.
 
 ## 🔒 Why Hassle Free PGP?
@@ -348,7 +366,7 @@ This application is designed with security as the top priority:
 
 ✅ **Open Source & Auditable**
 - All source code available for inspection
-- Security audit report included: [SECURITY_AUDIT_REPORT.md](SECURITY_AUDIT_REPORT.md)
+- Comprehensive security testing included
 - Automated security tests: `python test_security.py`
 
 ✅ **Secure by Design**
@@ -390,7 +408,7 @@ Like all software, this tool assumes a trusted local environment and cannot prot
 5. **Verify the code** - Review source before use in high-security environments
 6. **Backup safely** - Store key backups on encrypted, offline media
 
-For detailed security documentation, see [SECURITY.md](SECURITY.md).
+For security concerns, please open a GitHub issue or contact the maintainer.
 
 ## Limitations
 
@@ -409,7 +427,7 @@ Copyright (c) 2025 Pierce Alworth (@palwoth)
 This is a security-focused application. Contributions are welcome, but must maintain the security and offline guarantees.
 
 **Before contributing:**
-1. ⚠️ **Review [SECURITY.md](SECURITY.md)** - Understand security requirements
+1. ⚠️ **Understand security requirements** - Must maintain offline-only operation
 2. 🚫 **No network dependencies** - Must remain completely offline
 3. ✅ **Run security tests** - `python test_security.py` must pass
 4. ✅ **Run network audit** - `python scripts/audit_network_imports.py` must be clean
@@ -425,7 +443,7 @@ Built with a focus on making solid encryption accessible to everyone. Special th
 
 Found a bug? Have a feature request?
 - Open an issue on GitHub
-- For security vulnerabilities, see [SECURITY.md](SECURITY.md) for responsible disclosure
+- For security vulnerabilities, please contact [@palwoth](https://github.com/palwoth) directly
 
 **Note:** This is a passion project by Pierce Alworth ([@palwoth](https://github.com/palwoth)) to make encryption more accessible. Not affiliated with any company or organization.
 
