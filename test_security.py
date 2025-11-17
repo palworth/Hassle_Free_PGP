@@ -8,18 +8,19 @@ import tempfile
 from pathlib import Path
 from storage.key_store import KeyStore
 
+
 def test_path_traversal_protection():
     """Test that path traversal attacks are blocked."""
     print("=" * 70)
     print("Testing Path Traversal Protection")
     print("=" * 70)
-    
+
     # Create temporary keystore for testing
     with tempfile.TemporaryDirectory() as tmpdir:
         key_store = KeyStore(Path(tmpdir))
-        
+
         print("\n1. Testing malicious fingerprints...")
-        
+
         malicious_inputs = [
             "../../../etc/passwd",
             "..%2F..%2F..%2Fetc%2Fpasswd",
@@ -36,7 +37,7 @@ def test_path_traversal_protection():
             # Null byte injection (shouldn't work in Python 3)
             "ABCD\x00../../../etc/passwd",
         ]
-        
+
         failed = False
         for malicious_fp in malicious_inputs:
             result = key_store.get_key(malicious_fp, private=True)
@@ -45,9 +46,9 @@ def test_path_traversal_protection():
                 failed = True
             else:
                 print(f"   ✓ PASS: Blocked: {malicious_fp}")
-        
+
         print("\n2. Testing valid fingerprints...")
-        
+
         valid_inputs = [
             "1234567890ABCDEF1234567890ABCDEF12345678",  # Valid 40-char SHA-1
             "1234567890ABCDEF",  # Valid 16-char
@@ -55,15 +56,15 @@ def test_path_traversal_protection():
             "abcdef1234567890",  # Lowercase hex
             "12 34 56 78 90 AB CD EF",  # With spaces (should be cleaned)
         ]
-        
+
         for valid_fp in valid_inputs:
             # We expect None because the key doesn't exist, but it should NOT raise or fail validation
             result = key_store.get_key(valid_fp, private=True)
             # The method should return None (key not found), not raise an exception
             print(f"   ✓ PASS: Accepted valid format: {valid_fp} (returned: {result})")
-        
+
         print("\n3. Testing remove_key path traversal protection...")
-        
+
         # Test that remove_key also blocks malicious paths
         for malicious_fp in malicious_inputs[:5]:  # Test a few
             try:
@@ -72,7 +73,7 @@ def test_path_traversal_protection():
             except Exception as e:
                 print(f"   ✗ FAIL: remove_key raised exception: {e}")
                 failed = True
-        
+
         if failed:
             print("\n" + "=" * 70)
             print("❌ SECURITY TEST FAILED - Path traversal protection incomplete!")
@@ -90,10 +91,10 @@ def test_fingerprint_validation():
     print("\n" + "=" * 70)
     print("Testing Fingerprint Validation")
     print("=" * 70)
-    
+
     with tempfile.TemporaryDirectory() as tmpdir:
         key_store = KeyStore(Path(tmpdir))
-        
+
         # Test invalid fingerprints
         invalid_fps = [
             "",  # Empty
@@ -106,7 +107,7 @@ def test_fingerprint_validation():
             "12345678;rm -rf /",  # Command injection attempt
             "12345678 OR 1=1",  # SQL-like injection
         ]
-        
+
         print("\n1. Testing invalid fingerprints are rejected...")
         for fp in invalid_fps:
             result = key_store.get_key(fp, private=False)
@@ -115,7 +116,7 @@ def test_fingerprint_validation():
             else:
                 print(f"   ✗ FAIL: Accepted: {repr(fp)}")
                 return 1
-        
+
         print("\n" + "=" * 70)
         print("✅ FINGERPRINT VALIDATION TESTS PASSED")
         print("=" * 70)
@@ -127,11 +128,11 @@ def main():
     print("\n" + "=" * 70)
     print("PGP Security Test Suite")
     print("=" * 70)
-    
+
     try:
         result1 = test_path_traversal_protection()
         result2 = test_fingerprint_validation()
-        
+
         if result1 == 0 and result2 == 0:
             print("\n" + "=" * 70)
             print("🔒 ALL SECURITY TESTS PASSED!")
@@ -144,7 +145,7 @@ def main():
             return 0
         else:
             return 1
-            
+
     except Exception as e:
         print(f"\n✗ SECURITY TEST FAILED WITH EXCEPTION: {e}")
         import traceback
@@ -154,4 +155,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

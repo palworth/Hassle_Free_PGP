@@ -2,4 +2,3 @@
 from .keyring_view import KeyringView
 
 __all__ = ['KeyringView']
-
