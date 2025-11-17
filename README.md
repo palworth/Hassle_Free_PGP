@@ -16,10 +16,10 @@
 📖 **[Complete Beginner's Guide →](USER_GUIDE_FOR_NON_CODERS.md)**
 
 This guide explains:
-- ✅ How to install the app (super easy!)
-- ✅ What PGP actually does (in plain English)
-- ✅ How to send/receive secret messages
-- ✅ Step-by-step instructions with no technical jargon
+- How to install the app (super easy!)
+- What PGP actually does (in plain English)
+- How to send/receive secret messages
+- Step-by-step instructions with no technical jargon
 
 **Already familiar with PGP?** Continue reading below for installation and technical details.
 
