@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt || true
+          pip install -r setup/requirements.txt || true
           pip install flake8
 
       - name: Run flake8
@@ -50,7 +50,7 @@ jobs:
         run: pip install pip-audit
 
       - name: Run pip-audit
-        run: pip-audit -r requirements.txt
+        run: pip-audit -r setup/requirements.txt
 
   bandit:
     name: Security lint (Bandit)
@@ -67,7 +67,7 @@ jobs:
         run: pip install bandit
 
       - name: Run bandit
-        run: bandit -c bandit.yaml -r .
+        run: bandit -c config/bandit.yaml -r .
 
   tests:
     name: Security tests
@@ -81,8 +81,8 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r setup/requirements.txt
 
       - name: Run security tests
-        run: python test_security.py
+        run: python tests/test_security.py
 

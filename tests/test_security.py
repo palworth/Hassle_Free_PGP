@@ -6,7 +6,13 @@ Tests path traversal vulnerability fixes.
 import sys
 import tempfile
 from pathlib import Path
-from storage.key_store import KeyStore
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIR = PROJECT_ROOT / "src"
+if SRC_DIR.exists() and str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from hassle_free_pgp.storage.key_store import KeyStore  # noqa: E402
 
 
 def test_path_traversal_protection():

@@ -5,16 +5,16 @@ Works without Tkinter - perfect for servers and systems without GUI.
 """
 import sys
 
-from crypto.keys import (
+from hassle_free_pgp.crypto.encrypt_decrypt import decrypt_message, encrypt_message
+from hassle_free_pgp.crypto.keys import (
     ensure_private_key_is_protected,
     export_private_key,
     export_public_key,
     generate_keypair,
     import_key as crypto_import_key,
 )
-from crypto.encrypt_decrypt import encrypt_message, decrypt_message
-from crypto.sign_verify import sign_message, verify_signature
-from storage.key_store import KeyStore
+from hassle_free_pgp.crypto.sign_verify import sign_message, verify_signature
+from hassle_free_pgp.storage.key_store import KeyStore
 
 
 class PGPCLI:

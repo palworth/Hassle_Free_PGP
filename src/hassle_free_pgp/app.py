@@ -1,22 +1,24 @@
 """Main Tkinter application."""
 import logging
 import platform
+from typing import List, Optional
+
 import tkinter as tk
-from tkinter import ttk, scrolledtext, filedialog
-from gui.keyring_view import KeyringView
-from storage.key_store import KeyStore
-from crypto.keys import (
+from pgpy import PGPKey
+from tkinter import filedialog, scrolledtext, ttk
+
+from hassle_free_pgp.crypto.encrypt_decrypt import decrypt_message, encrypt_message
+from hassle_free_pgp.crypto.keys import (
     ensure_private_key_is_protected,
     export_private_key,
     export_public_key,
     generate_keypair,
     import_key as crypto_import_key,
 )
-from crypto.encrypt_decrypt import encrypt_message, decrypt_message
-from crypto.sign_verify import sign_message, verify_signature
-from pgpy import PGPKey
-from typing import List, Optional
-from colors import COLORS, BUTTON_COLORS
+from hassle_free_pgp.crypto.sign_verify import sign_message, verify_signature
+from hassle_free_pgp.gui.keyring_view import KeyringView
+from hassle_free_pgp.storage.key_store import KeyStore
+from hassle_free_pgp.ui.colors import BUTTON_COLORS, COLORS
 
 
 class PGPApplication:

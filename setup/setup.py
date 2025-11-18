@@ -5,7 +5,7 @@ Creates a standalone Mac .app bundle that users can double-click
 
 from setuptools import setup
 
-APP = ['app.py']
+APP = ['src/hassle_free_pgp/app.py']
 APP_NAME = 'Hassle Free PGP'
 VERSION = '1.0.0'
 
@@ -37,13 +37,13 @@ OPTIONS = {
         'objc',
     ],
     'includes': [
-        'app',
-        'gui.keyring_view',
-        'storage.key_store',
-        'crypto.keys',
-        'crypto.encrypt_decrypt',
-        'crypto.sign_verify',
-        'colors',
+        'hassle_free_pgp.app',
+        'hassle_free_pgp.gui.keyring_view',
+        'hassle_free_pgp.storage.key_store',
+        'hassle_free_pgp.crypto.keys',
+        'hassle_free_pgp.crypto.encrypt_decrypt',
+        'hassle_free_pgp.crypto.sign_verify',
+        'hassle_free_pgp.ui.colors',
     ],
     'excludes': [
         'numpy',

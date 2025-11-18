@@ -60,10 +60,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # 5. Install dependencies
-pip install -r requirements.txt
+pip install -r setup/requirements.txt
 
 # 6. Launch the app
-python app.py
+./run.sh
+# OR: python -m hassle_free_pgp.app
 ```
 
 ### Windows (PowerShell)
@@ -72,8 +73,8 @@ python app.py
 # Download the source (Git clone or GitHub ZIP) and open PowerShell in that folder
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python app.py
+pip install -r setup/requirements.txt
+python -m hassle_free_pgp.app
 ```
 
 ### Linux
@@ -84,18 +85,21 @@ git clone https://github.com/palwoth/Hassle_Free_PGP.git
 cd Hassle_Free_PGP
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-python app.py
+pip install -r setup/requirements.txt
+./run.sh
+# OR: python -m hassle_free_pgp.app
 ```
 
-Next time you want to use the app, just activate the existing `.venv` and run `python app.py` again—no need to reinstall anything.
+Next time you want to use the app, just activate the existing `.venv` and run `./run.sh` again—no need to reinstall anything.
 
 ### Need a drag-and-drop `.app`?
 
-When you’re ready to ship a Mac bundle to someone else, run:
+When you're ready to ship a Mac bundle to someone else, run:
 
 ```bash
-./build_app.sh
+cd setup
+python setup.py py2app
+cd ..
 cd dist
 zip -r Hassle_Free_PGP.zip "Hassle Free PGP.app"
 ```
@@ -157,12 +161,13 @@ If you're comfortable with Git and Python:
 
 3. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
+   pip install -r setup/requirements.txt
    ```
 
 4. **Run the application:**
    ```bash
-   python app.py
+   ./run.sh
+   # OR: python -m hassle_free_pgp.app
    ```
 
 ## 📖 How to Use
@@ -254,7 +259,7 @@ Verify protection against attacks:
 
 ```bash
 source venv/bin/activate
-python test_security.py
+python tests/test_security.py
 ```
 
 This verifies:
@@ -281,21 +286,35 @@ This scans the entire codebase for:
 ## Project Structure
 
 ```
-pgp_gui/
-├── crypto/              # Cryptographic operations
-│   ├── keys.py         # Key generation, import, export
-│   ├── encrypt_decrypt.py
-│   └── sign_verify.py
-├── storage/            # Key storage
-│   └── key_store.py
-├── gui/                # GUI components
-│   └── keyring_view.py
-├── scripts/            # Utility scripts
-│   └── audit_network_imports.py
-├── app.py             # Main application
-├── test_crypto.py     # CLI test script
-├── requirements.txt   # Dependencies
-└── SECURITY.md        # Security documentation
+Hassle_Free_PGP/
+├── src/
+│   └── hassle_free_pgp/    # Main application package
+│       ├── crypto/          # Cryptographic operations
+│       │   ├── keys.py
+│       │   ├── encrypt_decrypt.py
+│       │   └── sign_verify.py
+│       ├── storage/         # Key storage
+│       │   └── key_store.py
+│       ├── gui/              # GUI components
+│       │   └── keyring_view.py
+│       ├── ui/               # UI utilities
+│       │   └── colors.py
+│       ├── app.py            # Main application
+│       └── pgp_cli.py        # CLI interface
+├── tests/                    # Test suite
+│   └── test_security.py
+├── scripts/                  # Utility scripts
+│   ├── audit_network_imports.py
+│   └── check_for_keys.sh
+├── setup/                    # Setup and build files
+│   ├── setup.py
+│   ├── requirements.txt
+│   └── dev_run.sh
+├── config/                   # Configuration files
+│   └── bandit.yaml
+├── setup.cfg                 # Python tooling config (flake8, etc.)
+├── run.sh                    # Quick start script
+└── README.md
 ```
 
 ## 🔐 Security
@@ -312,7 +331,7 @@ This application is designed with security as the top priority:
 ✅ **Open Source & Auditable**
 - All source code available for inspection
 - Comprehensive security testing included
-- Automated security tests: `python test_security.py`
+- Automated security tests: `python tests/test_security.py`
 
 ✅ **Secure by Design**
 - Keys stored with proper Unix permissions (600 for files, 700 for directories)
@@ -374,7 +393,7 @@ This is a security-focused application. Contributions are welcome, but must main
 **Before contributing:**
 1. ⚠️ **Understand security requirements** - Must maintain offline-only operation
 2. 🚫 **No network dependencies** - Must remain completely offline
-3. ✅ **Run security tests** - `python test_security.py` must pass
+3. ✅ **Run security tests** - `python tests/test_security.py` must pass
 4. ✅ **Run network audit** - `python scripts/audit_network_imports.py` must be clean
 5. 🧪 **Test on air-gapped system** - If possible
 
